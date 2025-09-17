@@ -1,37 +1,20 @@
-import { PineconeClient } from "@pinecone-database/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 import { convertToAscii } from "./utils";
 import { getEmbeddings } from "./embeddings";
-// import { embeddingTransformer } from "./transformers";
 
 export async function getMatchesFromEmbeddings(
   embeddings: number[],
   fileKey: string
 ) {
-  const pinecone = new PineconeClient();
-  await pinecone.init({
-    apiKey: process.env.PINECONE_API_KEY!,
-    environment: process.env.PINECONE_ENVIRONMENT!,
-  });
-  const index = await pinecone.Index("chat-with-pdf");
+  const pinecone = new Pinecone();
+  const index = pinecone.Index("chat-with-pdf");
   try {
     const fileKeyWithoutAsci = convertToAscii(fileKey);
-    // const namespace = index.namespace(namespaceWithoutAscii);
-    const namespace = convertToAscii(fileKey);
-    const filter = { fileKey: { $eq: fileKeyWithoutAsci } };
-    // const queryResult = await index.query({
-    //   topK: 5,
-    //   vector: embeddings,
-    //   filter: filter,
-    //   includeMetadata: true,
-    // });
-
     const queryResult = await index.query({
-      queryRequest: {
-        topK: 5,
-        vector: embeddings,
-        filter: filter,
-        includeMetadata: true,
-      },
+      topK: 5,
+      vector: embeddings,
+      filter: { fileKey: { $eq: fileKeyWithoutAsci } },
+      includeMetadata: true,
     });
     console.log("queryRes=>", queryResult);
     return queryResult.matches || [];

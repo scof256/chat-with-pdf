@@ -1,11 +1,10 @@
 import { Configuration, OpenAIApi } from "openai-edge";
 import { OpenAIStream, StreamingTextResponse, Message } from "ai";
 import { getContext } from "@/lib/context";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats, messages as _messages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import _message from "@/db/models/messageModel";
 
 export const runtime = "edge";
 
@@ -15,6 +14,7 @@ const config = new Configuration({
 const openai = new OpenAIApi(config);
 
 export async function POST(req: Request) {
+  const db = getDb();
   try {
     const { messages, chatId } = await req.json();
 
@@ -72,6 +72,10 @@ export async function POST(req: Request) {
     });
     return new StreamingTextResponse(stream);
   } catch (error) {
-    console.log("some error happended in chatCompletion", error);
+    console.error("An error occurred in chat completion:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

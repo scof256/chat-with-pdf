@@ -4,7 +4,7 @@ import { utapi } from "uploadthing/server";
 import { UserButton, auth } from "@clerk/nextjs";
 import { ArrowRight, LogIn } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -14,6 +14,7 @@ export default async function Home() {
 
   let firstChat;
   if (userId) {
+    const db = getDb();
     firstChat = await db.select().from(chats).where(eq(chats.userId, userId));
     if (firstChat) {
       firstChat = firstChat[0];

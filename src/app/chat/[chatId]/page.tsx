@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/button";
 import PDFViewer from "@/components/PDFViewer";
 import { eq } from "drizzle-orm";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 // import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
@@ -24,7 +24,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
   if (!userId) {
     return redirect("/sign-in");
   }
-
+  const db = getDb();
   const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
   if (!_chats) {
     return redirect("/");

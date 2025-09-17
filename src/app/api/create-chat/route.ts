@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { loadPdfIntoPinecone } from "@/lib/pinecone";
 // import { loadS3IntoPinecone } from "@/lib/pinecone";
@@ -23,6 +23,7 @@ export async function POST(req: Request, res: Response) {
     const file_url = pdf[0].url;
     let doc = await loadPdfIntoPinecone(file_key, file_url);
     console.log("doc===>", doc);
+    const db = getDb();
     const chat_id = await db
       .insert(chats)
       .values({
