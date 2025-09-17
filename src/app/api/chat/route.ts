@@ -11,6 +11,7 @@ export const runtime = "edge";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_API_BASE_URL,
 });
 const openai = new OpenAIApi(config);
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
     };
 
     const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+      model: process.env.OPENAI_CHAT_MODEL_NAME || "gpt-3.5-turbo",
       messages: [
         prompt,
         ...messages.filter((message: Message) => message.role === "user"),
