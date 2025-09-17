@@ -1,0 +1,9 @@
+
+> chat-with-pdf@0.1.0 dev
+> set NODE_OPTIONS=--max-old-space-size=8192 && next dev
+
+- info Loaded env from /app/.env.local
+- warn You have enabled experimental feature (serverComponentsExternalPackages) in next.config.js.
+- warn Experimental features are not covered by semver, and may cause unexpected or broken application behavior. Use at your own risk.
+
+- [32mready[39m started server on 0.0.0.0:3000, url: http://localhost:3000
