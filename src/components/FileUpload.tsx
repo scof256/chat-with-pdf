@@ -1,32 +1,12 @@
 "use client";
 import { UploadDropzone } from "@uploadthing/react";
-
 import { OurFileRouter } from "@/app/api/uploadthing/core";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { useToast } from "./ui/use-toast";
-import { Loader2 } from "lucide-react";
+
 export const FileUpload = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [uploading, setUploading] = useState(false);
-  const { mutate, isLoading } = useMutation({
-    mutationFn: async ({
-      file_key,
-      file_name,
-    }: {
-      file_key: string;
-      file_name: string;
-    }) => {
-      const response = await axios.post("/api/create-chat", {
-        file_key,
-        file_name,
-      });
-      return response.data;
-    },
-  });
 
   return (
     <UploadDropzone<OurFileRouter>
@@ -42,40 +22,25 @@ export const FileUpload = () => {
                 </p>
               </>
             );
-
-          if (!isUploading && isLoading)
-            return (
-              <>
-                <p className="mt-2 text-sm text-slate-400 animate-pulse">
-                  Loading... Almost there!
-                </p>
-              </>
-            );
         },
       }}
       onClientUploadComplete={(res) => {
-        // Do something with the response
-        console.log("Files: ", res);
-        const data = {
-          file_key: res![0].key,
-          file_name: res![0].name,
-        };
-        mutate(data, {
-          onSuccess: ({ chat_id, chat_name }) => {
+        if (res && res[0] && res[0].serverData) {
+          const { chatId } = res[0].serverData;
+          if (chatId) {
             toast({
               title: "Chat created!",
-              description: `Chat session created for ${chat_name}`,
+              description: `Chat session created.`,
             });
-            router.push(`/chat/${chat_id}`);
-          },
-          onError: (err) => {
+            router.push(`/chat/${chatId}`);
+          } else {
             toast({
               variant: "destructive",
               title: "Error creating chat!",
+              description: "The chat ID was not returned from the server.",
             });
-            console.error(err);
-          },
-        });
+          }
+        }
       }}
       onUploadError={(error: Error) => {
         toast({
@@ -84,7 +49,6 @@ export const FileUpload = () => {
         });
       }}
       onUploadBegin={(name) => {
-        // Do something once upload begins
         console.log("Uploading: ", name);
       }}
     />
