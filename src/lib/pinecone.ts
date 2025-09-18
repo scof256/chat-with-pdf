@@ -1,11 +1,9 @@
 import {
   Pinecone,
 } from "@pinecone-database/pinecone";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import {
-  Document,
-  RecursiveCharacterTextSplitter,
-} from "@pinecone-database/doc-splitter";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { Document } from "@langchain/core/documents";
 import { downloadFromURL } from "./downloadFile";
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";

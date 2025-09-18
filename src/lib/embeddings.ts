@@ -1,22 +1,23 @@
-import { OpenAIApi, Configuration } from "openai-edge";
+import { VoyageEmbeddings } from "@langchain/community/embeddings/voyage";
 
-const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let embeddingsClient: VoyageEmbeddings | null = null;
 
-const openai = new OpenAIApi(config);
+const getEmbeddingsClient = () => {
+    if (!embeddingsClient) {
+        embeddingsClient = new VoyageEmbeddings({
+            modelName: "voyage-3.5-lite",
+        });
+    }
+    return embeddingsClient;
+}
 
 export async function getEmbeddings(text: string) {
   try {
-    const response = await openai.createEmbedding({
-      model: "text-embedding-ada-002",
-      input: text.replace(/\n/g, " "),
-    });
-    const result = await response.json();
-    console.log("getEmb result-=>", result);
-    return result?.data[0]?.embedding as number[];
+    const client = getEmbeddingsClient();
+    const res = await client.embedQuery(text.replace(/\n/g, " "));
+    return res;
   } catch (error) {
-    console.log("error calling openai embeddings ai", error);
+    console.log("error calling voyage ai embeddings", error);
     throw error;
   }
 }
