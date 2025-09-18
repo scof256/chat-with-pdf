@@ -1,5 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { currentUser } from "@clerk/nextjs";
+import { loadPdfIntoPinecone } from "@/lib/pinecone";
+import { db } from "@/lib/db";
+import { chats } from "@/lib/db/schema";
 
 const f = createUploadthing();
 
@@ -28,6 +31,19 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.userId);
 
       console.log("file url", file.url);
+      await loadPdfIntoPinecone(file.key, file.url);
+      const chat_id = await db
+        .insert(chats)
+        .values({
+          fileKey: file.key,
+          pdfName: file.name,
+          pdfUrl: file.url,
+          userId: metadata.userId,
+        })
+        .returning({
+          insertedId: chats?.id,
+        });
+      return { chat_id: chat_id[0].insertedId, chat_name: file.name };
     }),
 } satisfies FileRouter;
 

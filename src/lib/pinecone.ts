@@ -49,10 +49,7 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   const fileKeyWithoutAsci = convertToAscii(file_key);
   // vectorise and embed individual docs
   const vectors = await Promise.all(
-    documents
-      .flat()
-      .slice(0, 3)
-      .map((doc) => embedDocument(doc, fileKeyWithoutAsci))
+    documents.flat().map((doc) => embedDocument(doc, fileKeyWithoutAsci))
   );
   console.log("vectors", vectors);
 
@@ -62,12 +59,8 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
 
   // const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
   console.log("inserting vectors into pinecone");
-  const namespace = convertToAscii(file_key);
-  await pineconeIndex.upsert({
-    upsertRequest: {
-      vectors: vectors,
-    },
-  });
+  const namespace = pineconeIndex.namespace(convertToAscii(file_key));
+  await namespace.upsert(vectors);
   // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
   // let res = await pineconeIndex.upsert(vectors);
   console.log("res from pine==>");
@@ -104,8 +97,8 @@ async function prepareDoc(page: PDFPage) {
   pageContent = pageContent.replace(/\n/g, "");
   // split the docs
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 36000,
-    chunkOverlap: 0,
+    chunkSize: 1000,
+    chunkOverlap: 200,
   });
   const docs = await splitter.splitDocuments([
     new Document({
