@@ -3,7 +3,7 @@ import {
   Vector,
   utils as PineconeUtils,
 } from "@pinecone-database/pinecone";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {
   Document,
   RecursiveCharacterTextSplitter,
