@@ -51,6 +51,7 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2",
-    "uploadthing": "^5.5.3"
+    "uploadthing": "^5.5.3",
+    "voyageai": "^0.0.8"
   }
 }
