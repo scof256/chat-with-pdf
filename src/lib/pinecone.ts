@@ -74,7 +74,6 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
 async function embedDocument(doc: Document, file_key: string) {
   try {
     const embeddings = await getEmbeddings(doc.pageContent);
-    console.log("embeddings=>", embeddings);
     const hash = md5(doc.pageContent);
     return {
       id: hash,
