@@ -4,12 +4,10 @@ import { PanelRightOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/button";
 import PDFViewer from "@/components/PDFViewer";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
-// import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
-// import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -25,19 +23,22 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
     return redirect("/sign-in");
   }
 
+  // Fetch all chats for the sidebar
   const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
   if (!_chats) {
     return redirect("/");
   }
-  if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
+
+  // Fetch the current chat and verify ownership
+  const currentChat = await db
+    .select()
+    .from(chats)
+    .where(and(eq(chats.id, parseInt(chatId)), eq(chats.userId, userId)))
+    .then((res) => res[0]);
+
+  if (!currentChat) {
     return redirect("/");
   }
-
-  const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
-
-  // if (!_chats.find((chat) => chat._id === chatId)) {
-  //   return redirect("/");
-  // }
 
   return (
     <div className="flex max-h-[100dvh]">

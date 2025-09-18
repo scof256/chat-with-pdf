@@ -49,10 +49,7 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   const fileKeyWithoutAsci = convertToAscii(file_key);
   // vectorise and embed individual docs
   const vectors = await Promise.all(
-    documents
-      .flat()
-      .slice(0, 3)
-      .map((doc) => embedDocument(doc, fileKeyWithoutAsci))
+    documents.flat().map((doc) => embedDocument(doc, fileKeyWithoutAsci))
   );
   console.log("vectors", vectors);
 
