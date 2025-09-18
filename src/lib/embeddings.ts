@@ -7,11 +7,14 @@ const voyage = new VoyageAIClient({
 export async function getEmbeddings(text: string) {
   try {
     const result = await voyage.embed({
-      texts: [text.replace(/\n/g, " ")],
+      input: [text.replace(/\n/g, " ")],
       model: process.env.EMBEDDING_MODEL || "voyage-large-2-instruct",
     });
     console.log("getEmb result-=>", result);
-    return result?.embeddings[0] as number[];
+    if (!result.data || !result.data[0]) {
+      throw new Error("voyage embeddings failed");
+    }
+    return result.data[0].embedding as number[];
   } catch (error) {
     console.log("error calling voyage embeddings ai", error);
     throw error;
