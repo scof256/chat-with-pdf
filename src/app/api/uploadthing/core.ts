@@ -1,8 +1,5 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { currentUser } from "@clerk/nextjs";
-import { db } from "@/lib/db";
-import { chats } from "@/lib/db/schema";
-import { loadPdfIntoPinecone } from "@/lib/pinecone";
 
 const f = createUploadthing();
 
@@ -29,26 +26,6 @@ export const ourFileRouter = {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
       console.log("file url", file.url);
-      try {
-        await loadPdfIntoPinecone(file.key, file.url);
-
-        const chat_id = await db
-          .insert(chats)
-          .values({
-            fileKey: file.key,
-            pdfName: file.name,
-            pdfUrl: file.url,
-            userId: metadata.userId,
-          })
-          .returning({
-            insertedId: chats.id,
-          });
-
-        return { chatId: chat_id[0].insertedId };
-      } catch (error) {
-        console.error("Error in onUploadComplete:", error);
-        throw new Error("Failed to process PDF and create chat.");
-      }
     }),
 } satisfies FileRouter;
 
